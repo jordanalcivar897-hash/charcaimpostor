@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Charcaimpostor</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f2f2f2; }
+    #rol { font-size: 2em; margin: 20px; }
+    button { padding: 10px 20px; font-size: 1em; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Bienvenido a Charcaimpostor</h1>
+  <div id="rol">Pulsa "Entrar a la sala" para recibir tu rol</div>
+  <button id="entrar">Entrar a la sala</button>
+  <button id="reiniciar">Reiniciar partida</button>
+
+  <script>
+    const jugadores = 4;
+    const futbolistas = ["Lionel Messi","Cristiano Ronaldo","Neymar","Ronaldinho","Zidane","Mbappé","Haaland"];
+    let roles = [];
+    let repartido = false;
+
+    function repartirRoles() {
+      const aleatorio = futbolistas[Math.floor(Math.random() * futbolistas.length)];
+      roles = Array(jugadores).fill(aleatorio);
+      const impostorIndex = Math.floor(Math.random() * jugadores);
+      roles[impostorIndex] = "Eres el impostor";
+      repartido = true;
+    }
+
+    function entrar() {
+      if(!repartido) repartirRoles();
+      let jugadorId = sessionStorage.getItem("jugadorId");
+      if(jugadorId === null) {
+        // Asigna un jugador al azar que aún no haya entrado
+        let indicesDisponibles = [];
+        for(let i=0;i<roles.length;i++){
+          if(!sessionStorage.getItem("ocupado_" + i)) indicesDisponibles.push(i);
+        }
+        jugadorId = indicesDisponibles[Math.floor(Math.random()*indicesDisponibles.length)];
+        sessionStorage.setItem("jugadorId", jugadorId);
+        sessionStorage.setItem("ocupado_" + jugadorId, true);
+      }
+      document.getElementById("rol").innerText = roles[jugadorId];
+    }
+
+    function reiniciar() {
+      repartido = false;
+      sessionStorage.clear();
+      document.getElementById("rol").innerText = 'Pulsa "Entrar a la sala" para recibir tu rol';
+    }
+
+    document.getElementById("entrar").addEventListener("click", entrar);
+    document.getElementById("reiniciar").addEventListener("click", reiniciar);
+  </script>
+</body>
+</html>
